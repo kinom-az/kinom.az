@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Kinom.az — Filmlər</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+    --bg:#050505;
+    --card:#101010;
+    --border:#222;
+    --text:#fff;
+    --muted:#8b8b8b;
+    --accent:#ffffff;
+}
+
+body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+/* HEADER */
+
+header{
+    position:sticky;
+    top:0;
+    z-index:100;
+    height:72px;
+    background:rgba(5,5,5,.92);
+    backdrop-filter:blur(15px);
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.header-inner{
+    max-width:1250px;
+    height:100%;
+    margin:auto;
+    padding:0 24px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+/* LOGO */
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:#fff;
+    text-decoration:none;
+}
+
+.logo-symbol{
+    width:38px;
+    height:38px;
+    border:2px solid #fff;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:19px;
+    font-weight:900;
+    letter-spacing:-5px;
+    padding-right:5px;
+}
+
+.logo-text{
+    font-size:23px;
+    font-weight:800;
+    letter-spacing:-1px;
+}
+
+.logo-text span{
+    color:#777;
+}
+
+/* NAV */
+
+nav{
+    display:flex;
+    align-items:center;
+    gap:28px;
+}
+
+nav a{
+    color:#aaa;
+    text-decoration:none;
+    font-size:14px;
+    transition:.2s;
+}
+
+nav a:hover,
+nav a.active{
+    color:#fff;
+}
+
+/* SEARCH */
+
+.search{
+    width:220px;
+    height:40px;
+    border:1px solid #292929;
+    border-radius:22px;
+    background:#0d0d0d;
+    display:flex;
+    align-items:center;
+    padding:0 14px;
+}
+
+.search span{
+    color:#666;
+    margin-right:8px;
+}
+
+.search input{
+    width:100%;
+    border:0;
+    outline:0;
+    background:none;
+    color:#fff;
+    font-size:13px;
+}
+
+/* HERO */
+
+.hero{
+    max-width:1250px;
+    margin:auto;
+    padding:55px 24px 30px;
+}
+
+.hero-box{
+    min-height:410px;
+    border:1px solid #242424;
+    border-radius:22px;
+    background:
+        linear-gradient(90deg,#050505 0%,rgba(5,5,5,.96) 35%,rgba(5,5,5,.35) 75%,rgba(5,5,5,.8)),
+        radial-gradient(circle at 75% 40%,#292929,#090909 55%);
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+}
+
+.hero-content{
+    max-width:560px;
+    padding:50px;
+}
+
+.label{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    background:#fff;
+    color:#000;
+    padding:7px 12px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:bold;
+    margin-bottom:18px;
+}
+
+.hero h1{
+    font-size:55px;
+    line-height:1;
+    letter-spacing:-2px;
+    margin-bottom:18px;
+}
+
+.hero-description{
+    color:#aaa;
+    font-size:15px;
+    line-height:1.7;
+    max-width:500px;
+    margin-bottom:22px;
+}
+
+.meta{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    color:#aaa;
+    font-size:13px;
+    margin-bottom:25px;
+}
+
+.rating{
+    color:#fff;
+    font-weight:bold;
+}
+
+.watch-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    padding:13px 22px;
+    background:#fff;
+    color:#000;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:bold;
+    font-size:14px;
+    transition:.2s;
+}
+
+.watch-btn:hover{
+    transform:translateY(-2px);
+}
+
+/* CONTENT */
+
+.container{
+    max-width:1250px;
+    margin:auto;
+    padding:25px 24px 70px;
+}
+
+.section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.section-head h2{
+    font-size:25px;
+    letter-spacing:-.5px;
+}
+
+.see-all{
+    color:#777;
+    text-decoration:none;
+    font-size:13px;
+}
+
+/* CATEGORIES */
+
+.categories{
+    display:flex;
+    gap:9px;
+    overflow-x:auto;
+    padding-bottom:8px;
+    margin-bottom:35px;
+}
+
+.categories::-webkit-scrollbar{
+    display:none;
+}
+
+.category{
+    flex:none;
+    padding:10px 17px;
+    border:1px solid #272727;
+    border-radius:20px;
+    color:#999;
+    font-size:13px;
+    text-decoration:none;
+    transition:.2s;
+}
+
+.category:hover,
+.category.active{
+    background:#fff;
+    color:#000;
+    border-color:#fff;
+}
+
+/* MOVIES */
+
+.movies{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:18px;
+}
+
+.movie{
+    background:#0b0b0b;
+    border:1px solid #1e1e1e;
+    border-radius:13px;
+    overflow:hidden;
+    transition:.25s;
+}
+
+.movie:hover{
+    transform:translateY(-5px);
+    border-color:#444;
+}
+
+.poster{
+    aspect-ratio:2/3;
+    background:
+        linear-gradient(145deg,#202020,#090909);
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+}
+
+.poster-title{
+    color:#444;
+    font-size:13px;
+}
+
+.poster::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(transparent 60%,rgba(0,0,0,.7));
+}
+
+.year{
+    position:absolute;
+    z-index:2;
+    top:10px;
+    left:10px;
+    background:rgba(0,0,0,.7);
+    border:1px solid rgba(255,255,255,.15);
+    border-radius:5px;
+    padding:5px 7px;
+    font-size:10px;
+    color:#ccc;
+}
+
+.movie-info{
+    padding:14px;
+}
+
+.movie h3{
+    font-size:15px;
+    margin-bottom:7px;
+}
+
+.movie-info p{
+    color:#666;
+    font-size:12px;
+    margin-bottom:12px;
+}
+
+.movie-bottom{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.movie-rating{
+    font-size:12px;
+    color:#aaa;
+}
+
+.movie-watch{
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    background:#fff;
+    color:#000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    font-size:12px;
+}
+
+/* FOOTER */
+
+footer{
+    border-top:1px solid #1c1c1c;
+    padding:35px 20px;
+    text-align:center;
+    color:#555;
+    font-size:12px;
+}
+
+/* MOBILE */
+
+@media(max-width:900px){
+
+    nav{
+        display:none;
+    }
+
+    .search{
+        width:160px;
+    }
+
+    .movies{
+        grid-template-columns:repeat(3,1fr);
+    }
+
+}
+
+@media(max-width:600px){
+
+    header{
+        height:62px;
+    }
+
+    .header-inner{
+        padding:0 15px;
+    }
+
+    .logo-symbol{
+        width:34px;
+        height:34px;
+        font-size:17px;
+    }
+
+    .logo-text{
+        font-size:20px;
+    }
+
+    .search{
+        width:145px;
+        height:36px;
+    }
+
+    .hero{
+        padding:18px 15px 20px;
+    }
+
+    .hero-box{
+        min-height:430px;
+        border-radius:16px;
+    }
+
+    .hero-content{
+        padding:25px;
+        align-self:flex-end;
+    }
+
+    .hero h1{
+        font-size:39px;
+    }
+
+    .hero-description{
+        font-size:14px;
+    }
+
+    .container{
+        padding:20px 15px 55px;
+    }
+
+    .section-head h2{
+        font-size:21px;
+    }
+
+    .movies{
+        grid-template-columns:repeat(2,1fr);
+        gap:12px;
+    }
+
+    .movie-info{
+        padding:11px;
+    }
+
+    .movie h3{
+        font-size:14px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="header-inner">
+
+<a href="index.html" class="logo">
+
+<div class="logo-symbol">1K</div>
+
+<div class="logo-text">
+Kinom<span>.az</span>
+</div>
+
+</a>
+
+<nav>
+<a href="#" class="active">Ana səhifə</a>
+<a href="#">Filmlər</a>
+<a href="#">Seriallar</a>
+<a href="#">Kateqoriyalar</a>
+</nav>
+
+<div class="search">
+<span>⌕</span>
+<input type="text" placeholder="Film axtar...">
+</div>
+
+</div>
+
+</header>
+
+
+<section class="hero">
+
+<div class="hero-box">
+
+<div class="hero-content">
+
+<div class="label">
+● YENİ FİLM
+</div>
+
+<h1>Hozu Zona</h1>
+
+<p class="hero-description">
+Kinom.az-da ən yeni filmləri yüksək keyfiyyətdə kəşf et.
+Hozu Zona artıq platformamızda.
+</p>
+
+<div class="meta">
+
+<span class="rating">★ 8.5</span>
+<span>2026</span>
+<span>Azərbaycan</span>
+<span>Film</span>
+
+</div>
+
+<a href="hozu-zona.html" class="watch-btn">
+▶ Filmi izlə
+</a>
+
+</div>
+
+</div>
+
+</section>
+
+
+<main class="container">
+
+
+<div class="section-head">
+
+<h2>Filmlər</h2>
+
+<a href="#" class="see-all">
+Hamısına bax →
+</a>
+
+</div>
+
+
+<div class="categories">
+
+<a href="#" class="category active">Hamısı</a>
+<a href="#" class="category">Azərbaycan</a>
+<a href="#" class="category">Komediya</a>
+<a href="#" class="category">Dram</a>
+<a href="#" class="category">Aksiya</a>
+<a href="#" class="category">Romantik</a>
+
+</div>
+
+
+<div class="movies">
+
+
+<div class="movie">
+
+<div class="poster">
+<span class="year">2026</span>
+<span class="poster-title">POSTER</span>
+</div>
+
+<div class="movie-info">
+
+<h3>Hozu Zona</h3>
+
+<p>Azərbaycan • Film</p>
+
+<div class="movie-bottom">
+
+<span class="movie-rating">★ 8.5</span>
+
+<a href="hozu-zona.html" class="movie-watch">
+▶
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+
+</div>
+
+</main>
+
+
+<footer>
+
+© 2026 Kinom.az
+<br><br>
+Filmləri kəşf et. İzlə. Kinom.az.
+
+</footer>
+
+</body>
+               </html>
