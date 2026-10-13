@@ -173,6 +173,70 @@ header {
     background: #ddd;
 }
 
+/* LIKE VƏ İZLƏNMƏ */
+
+.movie-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 14px;
+    padding: 13px 16px;
+    background: #101010;
+    border: 1px solid #242424;
+    border-radius: 10px;
+}
+
+.view-count {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #aaa;
+    font-size: 14px;
+}
+
+.like-button {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 14px;
+    background: #171717;
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.like-button:hover {
+    border-color: #777;
+}
+
+.like-button:disabled {
+    opacity: .5;
+    cursor: wait;
+}
+
+.heart {
+    width: 21px;
+    height: 21px;
+    fill: none;
+    stroke: #aaa;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: fill .2s, stroke .2s;
+}
+
+.like-button.liked .heart {
+    fill: #ff304f;
+    stroke: #ff304f;
+}
+
+.like-button.liked {
+    border-color: #68202e;
+}
+
 /* FILM MƏLUMATLARI */
 
 .movie {
@@ -346,6 +410,40 @@ footer {
 
     </div>
 
+    <!-- İZLƏNMƏ VƏ LIKE SAYĞACI -->
+
+    <div class="movie-stats">
+
+        <div class="view-count">
+            <svg width="21" height="21"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2">
+                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <span id="viewCount">—</span>
+            <span>izlənmə</span>
+        </div>
+
+        <button
+            type="button"
+            class="like-button"
+            id="likeButton"
+            aria-label="Filmi bəyən"
+            aria-pressed="false"
+            disabled>
+            <svg class="heart"
+                 viewBox="0 0 24 24">
+                <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>
+            </svg>
+            <span id="likeCount">—</span>
+            <span>Like</span>
+        </button>
+
+    </div>
+
     <!-- FILM MƏLUMATLARI -->
 
     <section class="movie">
@@ -386,6 +484,173 @@ footer {
     Filmləri kəşf et. İzlə. Kinom.az.
 </footer>
 
+<!-- SUPABASE İZLƏNMƏ VƏ LIKE -->
+
+<script>
+(function () {
+    "use strict";
+
+    const SUPABASE_URL =
+        "https://ggzpgquawhjyeaujspwf.supabase.co";
+
+    const SUPABASE_KEY =
+        "sb_publishable_-W4LwK2jA7QOQIbctjyKLA_NB4nlwag";
+
+    const MOVIE_ID = "hozu-zona";
+
+    const viewCount = document.getElementById("viewCount");
+    const likeCount = document.getElementById("likeCount");
+    const likeButton = document.getElementById("likeButton");
+
+    const visitorStorageKey = "kinom_visitor_id";
+    const likeStorageKey = "kinom_like_" + MOVIE_ID;
+
+    let visitorId = null;
+    let liked = false;
+    let busy = false;
+
+    const headers = {
+        "apikey": SUPABASE_KEY,
+        "Content-Type": "application/json"
+    };
+
+    async function apiRequest(path, options = {}) {
+        const response = await fetch(
+            SUPABASE_URL + "/rest/v1/" + path,
+            {
+                ...options,
+                headers: {
+                    ...headers,
+                    ...(options.headers || {})
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                "Supabase xətası: " + response.status
+            );
+        }
+
+        return response.json();
+    }
+
+    function getVisitorId() {
+        try {
+            let id = localStorage.getItem(visitorStorageKey);
+
+            if (!id) {
+                id = crypto.randomUUID();
+                localStorage.setItem(visitorStorageKey, id);
+            }
+
+            return id;
+        } catch (error) {
+            return crypto.randomUUID();
+        }
+    }
+
+    function renderLike() {
+        likeButton.classList.toggle("liked", liked);
+        likeButton.setAttribute(
+            "aria-pressed",
+            String(liked)
+        );
+    }
+
+    async function loadStats() {
+        try {
+            const data = await apiRequest(
+                "movie_stats?movie_id=eq." +
+                encodeURIComponent(MOVIE_ID) +
+                "&select=views,likes"
+            );
+
+            if (data.length) {
+                viewCount.textContent = data[0].views;
+                likeCount.textContent = data[0].likes;
+            }
+
+            likeButton.disabled = false;
+        } catch (error) {
+            console.error("Statistika yüklənmədi:", error);
+        }
+    }
+
+    async function addView() {
+        try {
+            const result = await apiRequest(
+                "rpc/add_movie_view",
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        p_movie_id: MOVIE_ID
+                    })
+                }
+            );
+
+            if (typeof result === "number") {
+                viewCount.textContent = result;
+            }
+        } catch (error) {
+            console.error("İzlənmə qeydə alınmadı:", error);
+        }
+    }
+
+    likeButton.addEventListener("click", async function () {
+        if (busy || !visitorId) return;
+
+        busy = true;
+        likeButton.disabled = true;
+
+        try {
+            const result = await apiRequest(
+                "rpc/toggle_movie_like",
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        p_movie_id: MOVIE_ID,
+                        p_visitor_id: visitorId
+                    })
+                }
+            );
+
+            if (Array.isArray(result) && result.length) {
+                liked = result[0].liked;
+                likeCount.textContent =
+                    result[0].total_likes;
+
+                localStorage.setItem(
+                    likeStorageKey,
+                    liked ? "1" : "0"
+                );
+
+                renderLike();
+            }
+        } catch (error) {
+            console.error("Like xətası:", error);
+            alert("Like qeydə alınmadı. Yenidən yoxla.");
+        } finally {
+            busy = false;
+            likeButton.disabled = false;
+        }
+    });
+
+    visitorId = getVisitorId();
+
+    try {
+        liked = localStorage.getItem(likeStorageKey) === "1";
+    } catch (error) {
+        liked = false;
+    }
+
+    renderLike();
+    loadStats();
+
+    window.kinomAddMovieView = addView;
+})();
+</script>
+
 <!-- ADSTERRA SMARTLINK: HƏR YENİLƏNMƏDƏ BİR DƏFƏ -->
 
 <script>
@@ -422,6 +687,11 @@ footer {
         if (!videoStarted) {
             videoStarted = true;
             movieFrame.src = videoUrl;
+
+            // Supabase izlənmə sayğacını artır
+            if (typeof window.kinomAddMovieView === "function") {
+                window.kinomAddMovieView();
+            }
         }
 
         // Play örtüyünü gizlət
